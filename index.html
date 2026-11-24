@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fffdf8">
+  <title>Library Service Requests</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#home"><span class="book-mark" aria-hidden="true"></span> Library Service Desk</a>
+      <nav aria-label="Main navigation">
+        <a href="#home">Home</a>
+        <a href="#records">Manage Records</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+  <main class="wrap" id="main">
+    <section id="home" class="intro" aria-labelledby="page-title">
+      <div class="intro-copy">
+        <h1 id="page-title">Library Service<br>Requests</h1>
+        <p>Ask for help finding a book, borrowing materials, or using your library account. Track each request until it is resolved.</p>
+        <button class="primary" type="button" data-new>New request</button>
+      </div>
+      <div class="shelf" role="img" aria-label="Bookshelf with Effective Java, Eloquent JavaScript, Learning Web Design, and Think Python">
+        <span class="volume archive"><span class="volume-title">Effective Java</span></span>
+        <span class="volume journal"><span class="volume-title">Eloquent JavaScript</span></span>
+        <span class="volume index"><span class="volume-title">Learning Web Design</span></span>
+        <span class="volume ledger"><span class="volume-title">Think Python</span></span>
+        <span class="shelf-line"></span>
+      </div>
+    </section>
+    <section id="records" class="records" aria-labelledby="records-title">
+      <div class="section-heading">
+        <h2 id="records-title">Manage Records</h2>
+        <p id="count" role="status">Loading records…</p>
+      </div>
+      <div class="toolbar">
+        <div class="field">
+          <label for="search">Search by title</label>
+          <input id="search" type="search" placeholder="e.g. research methods">
+        </div>
+        <div class="field">
+          <label for="filter">Filter by status</label>
+          <select id="filter">
+            <option value="">All statuses</option>
+            <option>Pending</option>
+            <option>In progress</option>
+            <option>Completed</option>
+          </select>
+        </div>
+        <button class="secondary" id="clear-filters" type="button">Clear filters</button>
+      </div>
+      <p id="announcement" class="announcement" role="status" hidden></p>
+      <div id="load-error" class="announcement error" hidden>
+        <p id="load-message" role="alert"></p>
+        <button type="button" id="retry-load">Reload records</button>
+      </div>
+      <div class="catalog-heading" aria-hidden="true"><span>Request</span><span>Status</span><span>Actions</span></div>
+      <ul id="record-list" class="record-list" aria-label="Library requests"></ul>
+      <p id="empty" class="empty" hidden></p>
+    </section>
+    <section id="about" class="about" aria-labelledby="about-title">
+      <h2 id="about-title">About</h2>
+      <dl>
+        <div><dt>Project</dt><dd>Library Service Requests</dd></div>
+        <div><dt>Course</dt><dd>ICT251 · Activity 8</dd></div>
+        <div><dt>Student number</dt><dd id="student-number">202507020</dd></div>
+      </dl>
+      <p>Select New request to ask for help with a book, loan, or library account. Use View, Edit, or Delete to manage requests. Changes are saved in the shared database.</p>
+      <ul class="about-links">
+        <li><a id="api-guide">Backend API guide</a></li>
+        <li><a id="api-health">Database health check</a></li>
+      </ul>
+    </section>
+  </main>
+  <footer><div class="wrap">Library Service Requests · ICT251</div></footer>
+
+  <dialog id="request-dialog" aria-labelledby="form-title">
+    <h2 id="form-title">New request</h2>
+    <p id="edit-id" class="hint" hidden></p>
+    <form id="request-form" novalidate>
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" name="title" required autofocus aria-describedby="title-hint title-error">
+        <small class="hint" id="title-hint">3–80 characters</small>
+        <small class="field-error" id="title-error"></small>
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category" required aria-describedby="category-error">
+          <option value="">Choose a category</option>
+          <option>Book search</option>
+          <option>Borrowing</option>
+          <option>Account help</option>
+        </select>
+        <small class="field-error" id="category-error"></small>
+      </div>
+      <div class="field">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="4" required aria-describedby="description-hint description-error"></textarea>
+        <small class="hint" id="description-hint">5–300 characters</small>
+        <small class="field-error" id="description-error"></small>
+      </div>
+      <div class="field">
+        <label for="status">Status</label>
+        <select id="status" name="status" required aria-describedby="status-error">
+          <option>Pending</option>
+          <option>In progress</option>
+          <option>Completed</option>
+        </select>
+        <small class="field-error" id="status-error"></small>
+      </div>
+      <p id="form-error" class="field-error" role="alert"></p>
+      <div class="actions">
+        <button class="primary" id="save-request" type="submit">Add request</button>
+        <button id="cancel-edit" type="button">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="details-dialog" aria-labelledby="details-title">
+    <h2 id="details-title">Request details</h2>
+    <dl id="details" class="detail-list"></dl>
+    <form method="dialog"><button autofocus>Close</button></form>
+  </dialog>
+
+  <dialog id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description">
+    <h2 id="delete-title">Delete this request?</h2>
+    <p id="delete-description"></p>
+    <form method="dialog" class="actions">
+      <button value="cancel" autofocus>Cancel</button>
+      <button class="danger" value="confirm">Delete request</button>
+    </form>
+  </dialog>
+
+  <template id="record-template">
+    <li class="request-row">
+      <div class="record-copy">
+        <p class="metadata"><span class="record-id"></span><span class="record-category"></span></p>
+        <h3 class="record-title"></h3>
+      </div>
+      <span class="badge"></span>
+      <div class="actions record-actions">
+        <button type="button" data-action="view">View</button>
+        <button type="button" data-action="edit">Edit</button>
+        <button type="button" class="delete-action" data-action="delete">Delete</button>
+      </div>
+    </li>
+  </template>
+</body>
+</html>
